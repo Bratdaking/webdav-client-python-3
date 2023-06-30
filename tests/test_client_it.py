@@ -170,6 +170,17 @@ class ClientTestCase(BaseClientTestCase):
         self.client.upload_file(remote_path=self.remote_path_file, local_path=self.local_file_path)
         self.assertTrue(self.client.check(remote_path=self.remote_path_file), 'Expected the file is uploaded.')
 
+    def test_upload_file_progress(self):
+        self._prepare_for_uploading()
+        check = [False]
+        def progress(current, total, args):
+            args[0] = True
+            print(f"current = {current}, total = {total}")
+
+        self.client.upload_file(remote_path=self.remote_path_file, local_path=self.local_file_path, progress=progress, progress_args=[check])
+        self.assertTrue(self.client.check(remote_path=self.remote_path_file), 'Expected the file is uploaded.')
+        self.assertTrue(check[0], 'Progress function is called.')
+
     def test_upload_sync(self):
         self._prepare_for_uploading()
 
